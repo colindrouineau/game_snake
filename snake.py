@@ -12,7 +12,7 @@ STARTING_POSITION = (10, 5) # in tiles
 SNAKE_COLOR = (0, 175, 125)
 HEAD_COLOR = (0, 100, 200)
 FRUIT_COLOR = (250, 25, 25)
-DIRECTIONS = {'u': (-1,0), 'd': (1,0), 'l': (0,-1), 'r': (0,1)}
+DIRECTIONS = {'up': (-1,0), 'down': (1,0), 'left': (0,-1), 'right': (0,1)}
 
 class Snake():
 
