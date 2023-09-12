@@ -1,29 +1,30 @@
 import pygame
 from random import randint
 
-WHITE = (150, 150, 150)
-BLACK = (100, 100, 100)
+BACKGROUND_COLOR = (150, 150, 150)
+TILES_COLOR = (100, 100, 100)
 SCREEN_WIDTH = 400
 SCREEN_HEIGHT = 300
 CLOCK_FREQUENCY = 10
 TIME_LIMIT = 10 # s
 LENGHT_TILES = 20
-STARTING_POSITION = (10, 5) # en tiles
+STARTING_POSITION = (10, 5) # in tiles
 SNAKE_COLOR = (0, 175, 125)
 HEAD_COLOR = (0, 100, 200)
 FRUIT_COLOR = (250, 25, 25)
-DIRECTION = {'u': (-1,0), 'd': (1,0), 'l': (0,-1), 'r': (0,1)}
+DIRECTIONS = {'u': (-1,0), 'd': (1,0), 'l': (0,-1), 'r': (0,1)}
 
-class snake_class:
+class Snake():
+
     def __init__(self):
         self.position = [(10, 7), (10, 6), (10, 5)]
         self.direction = 'r'
         self.fruit_position = (randint(0, 14), randint(0, 19))
-        self.a_perdu = False
+        self.is_alive = True
         self.score = 0
 
     
-    def afficher(self):
+    def display(self):
         for i, j in self.position:
             rect = pygame.Rect(j*20, i*20, LENGHT_TILES, LENGHT_TILES)
             pygame.draw.rect(screen, SNAKE_COLOR, rect)
@@ -33,21 +34,22 @@ class snake_class:
         rect = pygame.Rect(self.fruit_position[1]*20, self.fruit_position[0]*20, LENGHT_TILES, LENGHT_TILES)
         pygame.draw.rect(screen, FRUIT_COLOR, rect)
 
-    def avancer(self):
+    def move(self):
         last_position = self.position[-1]
         for i in range(2, len(self.position)+1):
             self.position[-i+1] = self.position[-i]
         
-        hyp_pos = [self.position[0][0] + DIRECTION[self.direction][0], self.position[0][1] + DIRECTION[self.direction][1]]
-        if hyp_pos[0] < 0 :
-            hyp_pos[0] = 14
-        if hyp_pos[0] >= 15:
-            hyp_pos[0] = 0
-        if hyp_pos[1] < 0:
-            hyp_pos[1] = 19
-        if hyp_pos[1] >= 20:
-            hyp_pos[1] = 0
-        self.position[0] = (hyp_pos[0], hyp_pos[1])
+        futur_position = [self.position[0][0] + DIRECTIONS[self.direction][0], self.position[0][1] + DIRECTIONS[self.direction][1]]
+        # Si la tête du serpent sort de l'écran, on la fait réapparaître de l'autre côté de telle sorte que le serpent fait un tour
+        if futur_position[0] < 0 :
+            futur_position[0] = 14
+        if futur_position[0] >= 15:
+            futur_position[0] = 0
+        if futur_position[1] < 0:
+            futur_position[1] = 19
+        if futur_position[1] >= 20:
+            futur_position[1] = 0
+        self.position[0] = (futur_position[0], futur_position[1])
 
         if self.position[0] == self.fruit_position:
             self.position.append(last_position)
@@ -55,7 +57,7 @@ class snake_class:
             self.score += 1
         
         if self.position[0] in self.position[1:]:
-            self.a_perdu = True
+            self.is_alive = False
     
 
 pygame.init()
@@ -65,15 +67,15 @@ screen = pygame.display.set_mode( (SCREEN_WIDTH, SCREEN_HEIGHT) )
 clock = pygame.time.Clock()
 
 def starting_screen():
-    screen.fill( WHITE )
+    screen.fill( BACKGROUND_COLOR )
     for i in range(SCREEN_HEIGHT // LENGHT_TILES):
         for j in range(SCREEN_WIDTH // LENGHT_TILES):
             if (i + j) % 2 == 1:
                 rect = pygame.Rect(20*j, 20*i, LENGHT_TILES, LENGHT_TILES)
-                pygame.draw.rect(screen, BLACK, rect)
+                pygame.draw.rect(screen, TILES_COLOR, rect)
 
 def draw_game_over_screen():
-    screen.fill(BLACK)
+    screen.fill(TILES_COLOR)
     font = pygame.font.SysFont('arial', 40)
     title = font.render('Game Over', True, (255, 255, 255))
     screen.blit(title, (SCREEN_WIDTH/2 - title.get_width()/2, SCREEN_HEIGHT/2 - title.get_height()/3))
@@ -84,12 +86,11 @@ starting_screen()
 rect = pygame.Rect(STARTING_POSITION[1]*20, STARTING_POSITION[0]*20, 3*LENGHT_TILES, LENGHT_TILES)
 pygame.draw.rect(screen, SNAKE_COLOR, rect)
 
-snake = snake_class()
+snake = Snake()
 
-while not snake.a_perdu :
+while snake.is_alive :
     pygame.display.set_caption("snake.io - Score = " + str(snake.score))
     clock.tick(CLOCK_FREQUENCY)
-    
     one_passage = True
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN and one_passage:
@@ -105,12 +106,12 @@ while not snake.a_perdu :
 
             if event.key == pygame.K_q:
                 pygame.quit()
-                snake.a_perdu = True
+                snake.is_alive = False
     
-    snake.avancer()
+    snake.move()
 
     starting_screen()
-    snake.afficher()
+    snake.display()
     pygame.display.update()
 
 draw_game_over_screen()
