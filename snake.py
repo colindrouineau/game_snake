@@ -67,10 +67,21 @@ clock = pygame.time.Clock()
 def starting_screen():
     screen.fill( WHITE )
     for i in range(SCREEN_HEIGHT // LENGHT_TILES):
-        for j in range(SCREEN_WIDTH //LENGHT_TILES):
+        for j in range(SCREEN_WIDTH // LENGHT_TILES):
             if (i + j) % 2 == 1:
                 rect = pygame.Rect(20*j, 20*i, LENGHT_TILES, LENGHT_TILES)
                 pygame.draw.rect(screen, BLACK, rect)
+
+def draw_game_over_screen():
+    screen.fill((0, 0, 0))
+    font = pygame.font.SysFont('arial', 40)
+    title = font.render('Game Over', True, (255, 255, 255))
+    restart_button = font.render('R - Restart', True, (255, 255, 255))
+    quit_button = font.render('Q - Quit', True, (255, 255, 255))
+    screen.blit(title, (SCREEN_WIDTH/2 - title.get_width()/2, SCREEN_HEIGHT/2 - title.get_height()/3))
+    screen.blit(restart_button, (SCREEN_WIDTH/2 - restart_button.get_width()/2, SCREEN_HEIGHT/1.9 + restart_button.get_height()))
+    screen.blit(quit_button, (SCREEN_WIDTH/2 - quit_button.get_width()/2, SCREEN_HEIGHT/2 + quit_button.get_height()/2))
+    pygame.display.update()
 
 starting_screen()
 
@@ -83,8 +94,10 @@ while not snake.a_perdu :
     pygame.display.set_caption("snake.io - Score = " + str(snake.score))
     clock.tick(CLOCK_FREQUENCY)
     
+    one_passage = True
     for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN and one_passage:
+            one_passage = False
             if event.key == pygame.K_UP and snake.direction != 'd':
                 snake.direction = 'u'
             if event.key == pygame.K_DOWN and snake.direction != 'u':
@@ -96,6 +109,7 @@ while not snake.a_perdu :
 
             if event.key == pygame.K_q:
                 pygame.quit()
+                snake.a_perdu = True
     
     snake.avancer()
 
@@ -103,7 +117,7 @@ while not snake.a_perdu :
     snake.afficher()
     pygame.display.update()
 
-pygame.quit()
+draw_game_over_screen()
+clock.tick(0.1)
 
-# Problème :
-# revenir sur ses pas en faisant up left
+pygame.quit()
