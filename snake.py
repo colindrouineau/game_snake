@@ -73,14 +73,10 @@ def starting_screen():
                 pygame.draw.rect(screen, BLACK, rect)
 
 def draw_game_over_screen():
-    screen.fill((0, 0, 0))
+    screen.fill(BLACK)
     font = pygame.font.SysFont('arial', 40)
     title = font.render('Game Over', True, (255, 255, 255))
-    restart_button = font.render('R - Restart', True, (255, 255, 255))
-    quit_button = font.render('Q - Quit', True, (255, 255, 255))
     screen.blit(title, (SCREEN_WIDTH/2 - title.get_width()/2, SCREEN_HEIGHT/2 - title.get_height()/3))
-    screen.blit(restart_button, (SCREEN_WIDTH/2 - restart_button.get_width()/2, SCREEN_HEIGHT/1.9 + restart_button.get_height()))
-    screen.blit(quit_button, (SCREEN_WIDTH/2 - quit_button.get_width()/2, SCREEN_HEIGHT/2 + quit_button.get_height()/2))
     pygame.display.update()
 
 starting_screen()
